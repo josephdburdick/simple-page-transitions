@@ -3,7 +3,9 @@
   "private": true,
   "dependencies": {
     "bootstrap-sass": "~3.3.5",
-    "modernizr": "~2.8.1"
+    "modernizr": "~2.8.1",
+    "smoothstate": "~0.7.2",
+    "df-visible": "jquery-visible#~1.2.0"
   },
   "overrides": {
     "bootstrap-sass": {

@@ -27,21 +27,40 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div class="page-container">
-      <section><header>
-        <div class="page-title">
-          <h1>Page 1</h1>
-        </div>
-      </header></section>
+    <div class="page-container page-container--previous" id="page-prev">
+      <div class="container">
+        <section>
+          <header>
+            <div class="page-title">
+              <h3 class="text-center">Previous</h3>
+            </div>
+          </header>
+        </section>
+      </div>
     </div>
-    <div class="page-container hidden">
-      <section>
-        <header>
-          <div class="page-title">
-            <h1>About</h1>
-          </div>
-        </header>
-      </section>
+
+    <div class="page-container" id="page-current">
+      <div class="container">
+        <section class="full-height" id="section-about">
+          <header>
+            <div class="page-title">
+              <h1>Page 2</h1>
+            </div>
+          </header>
+        </section>
+      </div>
+    </div>
+
+    <div class="page-container page-container--next" id="page-next" data-url="index.html">
+      <div class="container">
+        <section>
+          <header>
+            <div class="page-title">
+              <h3 class="text-center">Next</h3>
+            </div>
+          </header>
+        </section>
+      </div>
     </div>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
@@ -56,6 +75,9 @@
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/smoothstate/src/jquery.smoothState.js"></script>
+    <script src="/bower_components/df-visible/jquery.visible.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
