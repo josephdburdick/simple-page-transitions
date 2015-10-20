@@ -11,7 +11,7 @@ $(function(){
           nextAreaID: '#page-next',
         },
         settings,
-
+        routes = ['index', 'work', 'services', 'about', 'thoughts'],
         getHeightandOffset = function getHeightandOffset(el){
           return $(el).outerHeight(true) + $(el).offset().top;
         },
