@@ -30,23 +30,28 @@ $(function(){
           // transition.direction
           // var loadedNewPage = _loadNewContent(transition);
           // debugger;
-          var content = $(transition.page),
-              number = content.find('h1').text().replace( /^\D+/g, ''),
-              text = content.find('h1').text().trim().replace(/[0-9]/g, '');
+          // var content = $(transition.page),
+          //     number = content.find('h1').text().replace( /^\D+/g, ''),
+          //     text = content.find('h1').text().trim().replace(/[0-9]/g, '');
           // content.find('h1').empty();
-          if (transition.direction === 'up') {
-            number--;
-          }
-          if (transition.direction === 'down') {
-            number++;
-          }
+          // if (transition.direction === 'up') {
+          //   number--;
+          // }
+          // if (transition.direction === 'down') {
+          //   number++;
+          // }
 
-          content.find('h1').text(text + ' ' + number);
+          // content.find('h1').text(text + ' ' + number);
 
 
           // content.show().find('.scene_element')
+          setTimeout(function(){
+            $('.scene_element').not('#page-current').addClass('scene_element--fadeinup');
+          }, 600);
         },
-
+        _isHidden = function _isHidden(el){
+          return $(el).css('opacity') === 0;
+        },
         _onScroll = function _onScroll(){
 
           $window.on('scroll', function(ev){
@@ -70,7 +75,9 @@ $(function(){
 
             if($window.scrollTop() + $window.height() > $document.height() - 60) {
               console.log('Near end of page.');
-              $('.scene_element:not(.scene_element--fadeinup)').addClass('scene_element--fadeinup');
+              setTimeout(function(){
+                $('.scene_element').not('#page-current').addClass('scene_element--fadeinup');
+              }, 300);
             }
 
             if($window.scrollTop() + $window.height() === $document.height()) {
