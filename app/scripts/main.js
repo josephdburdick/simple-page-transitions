@@ -1,3 +1,4 @@
+/*global $:false, jQuery:false, window:false */
 $(function(){
   'use strict';
   var pageManager = (function(){
@@ -11,27 +12,22 @@ $(function(){
           nextAreaID: '#page-next',
         },
         settings,
-        routes = ['index', 'work', 'services', 'about', 'thoughts'],
+        // routes = ['index', 'work', 'services', 'about', 'thoughts'],
         getHeightandOffset = function getHeightandOffset(el){
           return $(el).outerHeight(true) + $(el).offset().top;
         },
         distanceFromPageTop = function distanceFromPageTop(el){
           return getHeightandOffset(el);
         },
-        getElementBottom = function getElementBottom(el){
-          return $(el).position().top + $(el).outerHeight(true);
-        },
-        distanceFromPageBottom = function distanceFromPageBottom(el){
-          return $document.height() - getHeightandOffset(el);
-        },
-        // getPageTop = function getPageTop(){
-        //   return getHeightandOffset($);
+        // getElementBottom = function getElementBottom(el){
+        //   return $(el).position().top + $(el).outerHeight(true);
         // },
-        // getPageBottom = function getPageBottom(){
-        //   return $nextArea.outerHeight(true) + $nextArea.offset().top;
+        // distanceFromPageBottom = function distanceFromPageBottom(el){
+        //   return $document.height() - getHeightandOffset(el);
         // },
-        triggerPageTransition = function triggerPageTransition(url){
-
+        triggerPageTransition = function triggerPageTransition(transition){
+          // transition.direction
+          _loadNewContent(transition);
         },
 
         _onScroll = function _onScroll(){
@@ -40,33 +36,49 @@ $(function(){
             console.log(ev, settings);
 
             var thisScrollTop = Math.round($(this).scrollTop()),
-                thisInnerHeight = Math.round($(this).innerHeight()),
-                scrollPercent = 1 * $window.scrollTop() / ($document.height() - $window.height());
+                thisInnerHeight = Math.round($(this).innerHeight());
 
             if(thisScrollTop === 0) {
               // console.log("Reached beginning of page.");
-              debugger;
+              triggerPageTransition({direction: 'up'});
             }
 
-            if(thisScrollTop + thisInnerHeight + 1 >= $body.outerHeight()) {
+            if(thisScrollTop + thisInnerHeight === $body.outerHeight()) {
               // console.log("Reached end of page.");
-              _loadNewContent();
+
+            }
+
+            if($window.scrollTop() + $window.height() > $document.height() - 100) {
+              console.log('near bottom!');
+            }
+            if($window.scrollTop() + $window.height() === $document.height()) {
+              console.log('bottom!');
             }
 
           });
         },
         _loadNewContent = function _loadNewContent(){
-          var newlyLoadedContent,
-              url = $(settings.nextAreaID).data('url'),
-              contentId = url.replace('.html', ''),
-              ajaxLoadContentId = 'section-'+ contentId,
-              divTemplate = '<hr><section class="full-height" id="'+ ajaxLoadContentId +'"></section>';
+          var newPage = $(settings.mainAreaID).clone();
+          newPage.removeAttr('id').removeClass('active scene_element--fadeinup');
 
-          $(settings.mainAreaID).append(divTemplate);
-          newlyLoadedContent = $('#' + ajaxLoadContentId);
-          newlyLoadedContent.load(url + ' #page-current' );
+          debugger;
+          if ($(settings.mainAreaID).siblings(settings.pageContainerClass)){
+              $(settings.mainAreaID).siblings(settings.pageContainerClass).last().after(newPage);
+          } else {
+            $(settings.mainAreaID).after(newPage);
+          }
+          $(newPage).addClass('scene_element--fadeinup');
+          // var newlyLoadedContent,
+          //     url = $(settings.nextAreaID).data('url'),
+          //     contentId = url.replace('.html', ''),
+          //     ajaxLoadContentId = 'section-'+ contentId,
+          //     divTemplate = '<hr><section class="full-height" id="'+ ajaxLoadContentId +'"></section>';
+          //
+          // $(settings.mainAreaID).append(divTemplate);
+          // newlyLoadedContent = $('#' + ajaxLoadContentId);
+          // newlyLoadedContent.load(url + ' #page-current' );
         },
-        _render = function render(){
+        _render = function _render(){
           var bodyOffsetTop = distanceFromPageTop(settings.prevAreaID);
           $window.scrollTop(bodyOffsetTop);
 
@@ -74,7 +86,10 @@ $(function(){
             $window.on('scroll', _onScroll());
           }, 500);
 
-          $(settings.mainAreaID).addClass('active');
+          $(settings.mainAreaID).css({
+            marginTop: $(settings.prevAreaID).outerHeight(),
+            marginBottom: $(settings.nextAreaID).outerHeight()
+          }).addClass('active');
 
         },
         init = function init(options){
