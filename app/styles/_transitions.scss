@@ -1,10 +1,9 @@
 .m-scene {
   /** Basic styles for an animated element */
   .scene_element {
-    animation-duration: 0.25s;
-    transition-timing-function: ease-in;
+    animation-duration: 0.5s;
     animation-fill-mode: both;
-
+    transition-timing-function: cubic-bezier(0.445, 0.050, 0.550, 0.950); /* easeInOutSine */
   }
 
   /** An element that fades in */
@@ -15,6 +14,10 @@
   /** An element that fades in and slides up */
   .scene_element--fadeinup {
     animation-name: fadeInUp;
+  }
+
+  .scene_element--fadeindown {
+    animation-name: fadeInDown;
   }
 
   /** An element that fades in and slides from the right */
