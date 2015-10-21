@@ -3,7 +3,7 @@ $(function(){
   'use strict';
   var pageManager = (function(){
     var $window = $(window),
-        $document = $('document'),
+        $document = $(document),
         $body = $('body'),
         defaults = {
           pageContainerClass: '.page-container',
@@ -12,6 +12,7 @@ $(function(){
           nextAreaID: '#page-next',
         },
         settings,
+        newPage,
         // routes = ['index', 'work', 'services', 'about', 'thoughts'],
         getHeightandOffset = function getHeightandOffset(el){
           return $(el).outerHeight(true) + $(el).offset().top;
@@ -27,7 +28,23 @@ $(function(){
         // },
         triggerPageTransition = function triggerPageTransition(transition){
           // transition.direction
-          _loadNewContent(transition);
+          // var loadedNewPage = _loadNewContent(transition);
+          // debugger;
+          var content = $(transition.page),
+              number = content.find('h1').text().replace( /^\D+/g, ''),
+              text = content.find('h1').text().trim().replace(/[0-9]/g, '');
+          // content.find('h1').empty();
+          if (transition.direction === 'up') {
+            number--;
+          }
+          if (transition.direction === 'down') {
+            number++;
+          }
+
+          content.find('h1').text(text + ' ' + number);
+
+
+          // content.show().find('.scene_element')
         },
 
         _onScroll = function _onScroll(){
@@ -40,34 +57,45 @@ $(function(){
 
             if(thisScrollTop === 0) {
               // console.log("Reached beginning of page.");
-              triggerPageTransition({direction: 'up'});
+              var appendedPage = _loadNewContent();
+              triggerPageTransition({
+                direction: 'up',
+                page: appendedPage
+              });
             }
 
             if(thisScrollTop + thisInnerHeight === $body.outerHeight()) {
-              // console.log("Reached end of page.");
-
+              console.log('Reached end of page.');
             }
 
-            if($window.scrollTop() + $window.height() > $document.height() - 100) {
-              console.log('near bottom!');
+            if($window.scrollTop() + $window.height() > $document.height() - 60) {
+              console.log('Near end of page.');
+              $('.scene_element:not(.scene_element--fadeinup)').addClass('scene_element--fadeinup');
             }
+
             if($window.scrollTop() + $window.height() === $document.height()) {
-              console.log('bottom!');
+              var appendedPage = _loadNewContent();
+              triggerPageTransition({
+                direction: 'down',
+                page: appendedPage
+              });
             }
 
           });
         },
         _loadNewContent = function _loadNewContent(){
-          var newPage = $(settings.mainAreaID).clone();
-          newPage.removeAttr('id').removeClass('active scene_element--fadeinup');
+          var clonePage = $(settings.mainAreaID).find('.container').clone();
+          clonePage.find('.scene_element').removeClass('active scene_element--fadeinup scene_element--fadein');
+          $(clonePage).appendTo(settings.mainAreaID);
 
-          debugger;
-          if ($(settings.mainAreaID).siblings(settings.pageContainerClass)){
-              $(settings.mainAreaID).siblings(settings.pageContainerClass).last().after(newPage);
-          } else {
-            $(settings.mainAreaID).after(newPage);
-          }
-          $(newPage).addClass('scene_element--fadeinup');
+          return clonePage;
+          // debugger;
+          // if ($(settings.mainAreaID).siblings(settings.pageContainerClass)){
+          //   $(settings.mainAreaID).siblings(settings.pageContainerClass).last().after(newPage);
+          // } else {
+          //   $(settings.mainAreaID).after(newPage);
+          // }
+          //$(newPage).addClass('scene_element--fadeinup');
           // var newlyLoadedContent,
           //     url = $(settings.nextAreaID).data('url'),
           //     contentId = url.replace('.html', ''),
