@@ -4,13 +4,18 @@ $icon-font-path: '../fonts/';
 @import "bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 // endbower
 
+@import "keyframes";
+@import "transitions";
+
 .browserupgrade {
   margin: 0.2em 0;
   background: #ccc;
   color: #000;
   padding: 0.2em 0;
 }
-
+.fixed-position{
+  position: fixed;
+}
 .full-height{
   height: 110vh;
 }
@@ -18,12 +23,28 @@ $icon-font-path: '../fonts/';
 .page-container{
   // opacity: 0;
   background: #e0e0e0;
-
+  .page-title{
+    line-height: 100vh;
+  }
   &.active{
     opacity: 1;
   }
 }
 .page-container--previous,
 .page-container--next{
-  background: yellow;
+  background: rgba(yellow, .2);
+  left: 0;
+  right:0;
+  padding: 20px 0;
+}
+
+.page-container--previous{
+  top: 0;
+}
+.page-container--next{
+  bottom: 0;
+}
+.page-block{
+  background: white;
+  opacity: 0;
 }

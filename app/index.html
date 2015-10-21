@@ -27,41 +27,36 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div class="page-container page-container--previous" id="page-prev">
+    <div class="page-container--previous fixed-position" id="page-prev">
+      <div class="container">
+        <section >
+          <header class="page-title">
+            <h3 class="text-center">Previous</h3>
+          </header>
+        </section>
+      </div>
+    </div>
+    <div class="page-container--next fixed-position" id="page-next" data-url="about.html">
       <div class="container">
         <section>
-          <header>
-            <div class="page-title">
-              <h3 class="text-center">Previous</h3>
-            </div>
+          <header class="page-title">
+            <h3 class="text-center">Next</h3>
           </header>
         </section>
       </div>
     </div>
 
-    <div class="page-container" id="page-current">
+    <div class="page-container m-scene" id="page-current">
       <div class="container">
-        <section class="full-height">
-          <header>
-            <div class="page-title">
-              <h1>Page 1</h1>
-            </div>
-          </header>
+        <section class="page-block full-height scene_element scene_element--fadein">
+          <h1 class="page-title full-height text-center text-muted">
+            Page
+          </h1>
         </section>
       </div>
     </div>
 
-    <div class="page-container page-container--next" id="page-next" data-url="about.html">
-      <div class="container">
-        <section>
-          <header>
-            <div class="page-title">
-              <h3 class="text-center">Next</h3>
-            </div>
-          </header>
-        </section>
-      </div>
-    </div>
+
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
     <script>
