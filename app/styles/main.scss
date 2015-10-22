@@ -44,10 +44,10 @@ h1.full-height{
   transition: all .2s ease-in-out 1s;
   overflow: hidden;
   // opacity: 0;
-  &.active{
-    opacity: 1;
-    position: relative;
-  }
+  // &.active{
+  //   opacity: 1;
+  //   position: relative;
+  // }
   &.append{
     bottom: 0;
   }
