@@ -23,6 +23,10 @@ gulp.task('styles', () => {
     .pipe(reload({stream: true}));
 });
 
+// gulp.task('scripts', () => {
+//   return gulp.src('app/scripts/')
+// });
+
 function lint(files, options) {
   return () => {
     return gulp.src(files)
@@ -158,10 +162,10 @@ gulp.task('wiredep', () => {
 
 gulp.task('deploy', ['build'], function() {
   return gulp.src('./dist/**/*')
-    .pipe($.ghPages());
+    .pipe($.ghPages('git@github.com:josephdburdick/simple-page-transitions.git'));
 });
 
-gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras'], () => {
+gulp.task('build', ['html', 'images', 'fonts', 'extras'], () => {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
