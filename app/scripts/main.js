@@ -20,6 +20,32 @@ $(function(){
                     '<div class="page-container--loader scene_element">LOADING...</div>',
                   '</div>'].join('\n');
         },
+
+        _loadSpeedBump = function _loadSpeedBump(direction){
+          var $speedBumpEl = null,
+              id = settings.nextAreaID.replace('#', ''),
+              speedBumpHTML = _templateSpeedBump({ id: id, direction: direction }),
+              speedBump = $.parseHTML(speedBumpHTML);
+
+          if (!$('#' + $(speedBump).attr('id')).length){
+            if (direction === "append") {
+              $(settings.stage).append(speedBumpHTML);
+            } else {
+              $(settings.stage).prepend(speedBumpHTML);
+            }
+            $speedBumpEl = $('#' + $(speedBump).attr('id'));
+            $speedBumpEl.addClass('scene_element--fadeinup');
+
+            _loadInNextPage({
+              speedBumpEl: $speedBumpEl,
+              direction: direction
+            });
+
+          } else {
+            $speedBumpEl = $('#' + $(speedBump).attr('id'));
+            $speedBumpEl.toggleClass('scene_element--fadeinup');
+          }
+        },
         _loadInNextPage = function _loadInNextPage(args){
           var status = false;
           $.get('index.html')
@@ -52,32 +78,6 @@ $(function(){
             return status;
           }
         },
-        _loadSpeedBump = function _loadSpeedBump(direction){
-          var $speedBumpEl = null,
-              id = settings.nextAreaID.replace('#', ''),
-              speedBumpHTML = _templateSpeedBump({ id: id, direction: direction }),
-              speedBump = $.parseHTML(speedBumpHTML);
-
-          if (!$('#' + $(speedBump).attr('id')).length){
-            if (direction === "append") {
-              $(settings.stage).append(speedBumpHTML);
-            } else {
-              $(settings.stage).prepend(speedBumpHTML);
-            }
-            $speedBumpEl = $('#' + $(speedBump).attr('id'));
-            $speedBumpEl.addClass('scene_element--fadeinup');
-
-            _loadInNextPage({
-              speedBumpEl: $speedBumpEl,
-              direction: direction
-            });
-
-          } else {
-            debugger;
-            $speedBumpEl = $('#' + $(speedBump).attr('id'));
-            $speedBumpEl.addClass('scene_element--fadeinup');
-          }
-        },
         getHeightandOffset = function getHeightandOffset(el){
           return $(el).outerHeight(true) + $(el).offset().top;
         },
@@ -88,11 +88,17 @@ $(function(){
           if (transition.direction === "prepend"){
             setTimeout(function(){
               $(transition.page).addClass('scene_element--fadeindown');
+              setTimeout(function(){
+                $(transition.speedBumpEl).toggleClass('scene_element--fadeinup');
+              }, 1000);
             }, 1000);
           }
           if (transition.direction === "append"){
             setTimeout(function(){
               $(transition.page).addClass('scene_element--fadeinup');
+              setTimeout(function(){
+                $(transition.speedBumpEl).toggleClass('scene_element--fadeinup');
+              }, 1000);
             }, 1000);
           }
         },
@@ -125,8 +131,6 @@ $(function(){
         },
         _loadNewContent = function _loadNewContent(direction){
           var clonePage;
-
-
           if (direction === "append"){
             clonePage = $(settings.mainAreaID).find('.container').last().clone();
             clonePage.addClass('clone').find('.scene_element').removeClass('active scene_element--fadeinup scene_element--fadeindown scene_element--fadein');
