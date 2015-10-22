@@ -2,6 +2,7 @@ node_modules
 dist
 .tmp
 .sass-cache
+.publish
 bower_components
 test/bower_components
 # Created by https://www.gitignore.io/api/osx,windows,linux,atom,sublimetext,sass
@@ -86,4 +87,3 @@ sftp-config.json
 ### Sass ###
 .sass-cache/
 *.css.map
-
