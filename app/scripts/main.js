@@ -25,75 +25,32 @@ $(function(){
           $.get('index.html')
             .then(function(result){
               var $html = $(result),
-                  $parsedPage = $html.find(settings.page);
-                  status = true;
-
+                  $parsedPage = $html.find(settings.page)[0];
+                  status = !!$parsedPage;
+              if (status){
+                setTimeout(function(){
+                  $(args.speedBumpEl).toggleClass('scene_element--fadeinup scene_element--fadeoutdown');
+                }, 500);
+              }
               if (args.direction === "append") {
                 $(settings.stage).find(settings.page).append($parsedPage);
               } else {
                 $(settings.stage).find(settings.page).prepend($parsedPage);
               }
               triggerPageTransition({
-                status: status,
-                page: $parsedPage
+                loaded: status,
+                page: $parsedPage,
+                direction: args.direction
               });
+
             }, function(){
-              console.log(status);
+              triggerPageTransition({loaded: false});
             });
-          // .then(function(result){
-          //   var $html = $(result),
-          //       $parsedPage = $html.find(settings.page);
-          //       status = true;
-          //   debugger;
-          //   return status;
-          // }, loadNextPageError);
-          // $.ajax({
-          //   type: 'GET',
-          //   url: 'index.html',
-          //   success: loadNextPageSuccess,
-          //   error: loadNextPageError
-          // });
-          // function loadNextPageSuccess(result){
-          //   var $html = $(result),
-          //       $parsedPage = $html.find(settings.page);
-          //
-          //   if (args.direction === "append") {
-          //     $(settings.stage).find(settings.page).append($parsedPage);
-          //   } else {
-          //     $(settings.stage).find(settings.page).prepend($parsedPage);
-          //   }
-          //   status = true;
-          //   debugger;
-          //   return {
-          //     result: $parsedPage,
-          //     status: status
-          //   };
-          // }
-          //
           function loadNextPageError(xhr, status, error){
             status = false;
             console.log(error);
             return status;
           }
-            // .done(function(result){
-            //   var $html = $(result),
-            //       $parsedPage = $html.find(settings.page);
-            //
-            //   if (args.direction === "append") {
-            //     $(settings.stage).find(settings.page).append($parsedPage);
-            //   } else {
-            //     $(settings.stage).find(settings.page).prepend($parsedPage);
-            //   }
-            //   status = true;
-            //   return {
-            //     result: $parsedPage,
-            //     status: status
-            //   };
-            // })
-            // .fail(function(status){
-            //   status = false;
-            //   return status;
-            // });
         },
         _loadSpeedBump = function _loadSpeedBump(direction){
           var $speedBumpEl = null,
@@ -111,12 +68,14 @@ $(function(){
             $speedBumpEl.addClass('scene_element--fadeinup');
 
             _loadInNextPage({
-              speedbumpEl: $speedBumpEl,
+              speedBumpEl: $speedBumpEl,
               direction: direction
             });
 
           } else {
-            return false;
+            debugger;
+            $speedBumpEl = $('#' + $(speedBump).attr('id'));
+            $speedBumpEl.addClass('scene_element--fadeinup');
           }
         },
         getHeightandOffset = function getHeightandOffset(el){
@@ -126,15 +85,14 @@ $(function(){
           return $(el).offset().top;
         },
         triggerPageTransition = function triggerPageTransition(transition){
-          debugger;
           if (transition.direction === "prepend"){
             setTimeout(function(){
-              $('.scene_element').not('#page-current').addClass('scene_element--fadeindown');
+              $(transition.page).addClass('scene_element--fadeindown');
             }, 1000);
           }
           if (transition.direction === "append"){
             setTimeout(function(){
-              $('.scene_element').not('#page-current').addClass('scene_element--fadeinup');
+              $(transition.page).addClass('scene_element--fadeinup');
             }, 1000);
           }
         },
@@ -161,8 +119,6 @@ $(function(){
               setTimeout(function(){
                 _loadSpeedBump('append');
               },1000);
-
-              // _loadNewContent('append');
             }
 
           });

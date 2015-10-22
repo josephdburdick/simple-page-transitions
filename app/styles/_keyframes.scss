@@ -26,6 +26,18 @@
     transform: none;
   }
 }
+
+@keyframes fadeOutDown {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
 @keyframes fadeInRight {
   0% {
     opacity: 0;

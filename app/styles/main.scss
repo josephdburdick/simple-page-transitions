@@ -31,7 +31,7 @@ h1.full-height{
 }
 .page-container--loader-container{
   $height: 10vh;
-  position: relative;
+  position: fixed;
   line-height: $height;
   left: 0;
   right:0;
