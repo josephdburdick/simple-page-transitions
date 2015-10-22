@@ -7,17 +7,93 @@ $(function(){
         $body = $('body'),
         defaults = {
           stage: '[data-role="stage"]',
+          page: '[data-role="page"]',
           pageContainerClass: '.page-container',
           mainAreaID: '#page-current',
           prevAreaID:  '#page-prev',
           nextAreaID: '#page-next',
         },
         settings,
-        newPage,
+
         _templateSpeedBump = function _templateSpeedBump(options){
           return ['<div class="page-container--loader-container scene_element '+ options.direction +'" id="'+ options.id +'">',
                     '<div class="page-container--loader scene_element">LOADING...</div>',
                   '</div>'].join('\n');
+        },
+        _loadInNextPage = function _loadInNextPage(args){
+          var status = false;
+          $.get('index.html')
+            .then(function(result){
+              var $html = $(result),
+                  $parsedPage = $html.find(settings.page);
+                  status = true;
+
+              if (args.direction === "append") {
+                $(settings.stage).find(settings.page).append($parsedPage);
+              } else {
+                $(settings.stage).find(settings.page).prepend($parsedPage);
+              }
+              triggerPageTransition({
+                status: status,
+                page: $parsedPage
+              });
+            }, function(){
+              console.log(status);
+            });
+          // .then(function(result){
+          //   var $html = $(result),
+          //       $parsedPage = $html.find(settings.page);
+          //       status = true;
+          //   debugger;
+          //   return status;
+          // }, loadNextPageError);
+          // $.ajax({
+          //   type: 'GET',
+          //   url: 'index.html',
+          //   success: loadNextPageSuccess,
+          //   error: loadNextPageError
+          // });
+          // function loadNextPageSuccess(result){
+          //   var $html = $(result),
+          //       $parsedPage = $html.find(settings.page);
+          //
+          //   if (args.direction === "append") {
+          //     $(settings.stage).find(settings.page).append($parsedPage);
+          //   } else {
+          //     $(settings.stage).find(settings.page).prepend($parsedPage);
+          //   }
+          //   status = true;
+          //   debugger;
+          //   return {
+          //     result: $parsedPage,
+          //     status: status
+          //   };
+          // }
+          //
+          function loadNextPageError(xhr, status, error){
+            status = false;
+            console.log(error);
+            return status;
+          }
+            // .done(function(result){
+            //   var $html = $(result),
+            //       $parsedPage = $html.find(settings.page);
+            //
+            //   if (args.direction === "append") {
+            //     $(settings.stage).find(settings.page).append($parsedPage);
+            //   } else {
+            //     $(settings.stage).find(settings.page).prepend($parsedPage);
+            //   }
+            //   status = true;
+            //   return {
+            //     result: $parsedPage,
+            //     status: status
+            //   };
+            // })
+            // .fail(function(status){
+            //   status = false;
+            //   return status;
+            // });
         },
         _loadSpeedBump = function _loadSpeedBump(direction){
           var $speedBumpEl = null,
@@ -32,16 +108,17 @@ $(function(){
               $(settings.stage).prepend(speedBumpHTML);
             }
             $speedBumpEl = $('#' + $(speedBump).attr('id'));
-
             $speedBumpEl.addClass('scene_element--fadeinup');
-            // setTimeout(function(){
-            //   $speedBumpEl.find('.page-container--loader').addClass('scene_element--fadeinup');
-            // }, 1000);
+
+            _loadInNextPage({
+              speedbumpEl: $speedBumpEl,
+              direction: direction
+            });
+
           } else {
             return false;
           }
         },
-        // routes = ['index', 'work', 'services', 'about', 'thoughts'],
         getHeightandOffset = function getHeightandOffset(el){
           return $(el).outerHeight(true) + $(el).offset().top;
         },
@@ -49,6 +126,7 @@ $(function(){
           return $(el).offset().top;
         },
         triggerPageTransition = function triggerPageTransition(transition){
+          debugger;
           if (transition.direction === "prepend"){
             setTimeout(function(){
               $('.scene_element').not('#page-current').addClass('scene_element--fadeindown');
@@ -117,11 +195,6 @@ $(function(){
           setTimeout(function(){
             $window.on('scroll', _onScroll());
           }, 500);
-
-          $(settings.mainAreaID).css({
-            marginTop: $(settings.prevAreaID).outerHeight(),
-            marginBottom: $(settings.nextAreaID).outerHeight()
-          }).addClass('active');
         },
         init = function init(options){
           settings = $.extend({}, defaults, options);
