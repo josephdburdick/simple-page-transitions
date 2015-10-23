@@ -14,7 +14,12 @@ $(function(){
           nextAreaID: '#page-next',
         },
         settings,
-
+        getHeightandOffset = function getHeightandOffset(el){
+          return $(el).outerHeight(true) + $(el).offset().top;
+        },
+        distanceFromPageTop = function distanceFromPageTop(el){
+          return $(el).offset().top;
+        },
         _templateSpeedBump = function _templateSpeedBump(options){
           return ['<div class="page-container--loader-container scene_element '+ options.direction +'" id="'+ options.id +'">',
                     '<div class="page-container--loader scene_element">LOADING...</div>',
@@ -56,7 +61,7 @@ $(function(){
               if (status){
                 setTimeout(function(){
                   $(args.speedBumpEl).toggleClass('scene_element--fadeinup scene_element--fadeoutdown');
-                }, 500);
+                }, 1000);
               }
               if (args.direction === "append") {
                 $(settings.stage).find(settings.page).append($parsedPage);
@@ -78,26 +83,24 @@ $(function(){
             return status;
           }
         },
-        getHeightandOffset = function getHeightandOffset(el){
-          return $(el).outerHeight(true) + $(el).offset().top;
-        },
-        distanceFromPageTop = function distanceFromPageTop(el){
-          return $(el).offset().top;
-        },
         triggerPageTransition = function triggerPageTransition(transition){
           if (transition.direction === "prepend"){
             setTimeout(function(){
               $(transition.page).addClass('scene_element--fadeindown');
+              $('html, body').animate({ scrollTop: $(transition.page).offset().top / 8 }, 500);
               setTimeout(function(){
                 $(transition.speedBumpEl).toggleClass('scene_element--fadeinup');
+
               }, 1000);
             }, 1000);
           }
           if (transition.direction === "append"){
             setTimeout(function(){
               $(transition.page).addClass('scene_element--fadeinup');
+              $('html, body').animate({ scrollTop: $(transition.page).offset().top / 8 }, 500);
               setTimeout(function(){
                 $(transition.speedBumpEl).toggleClass('scene_element--fadeinup');
+
               }, 1000);
             }, 1000);
           }
