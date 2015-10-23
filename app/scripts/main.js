@@ -21,37 +21,37 @@ $(function(){
           return $(el).offset().top;
         },
         _templateSpeedBump = function _templateSpeedBump(options){
-          return ['<div class="page-container--loader-container scene_element '+ options.direction +'" id="'+ options.id +'">',
+          return ['<div class="page-container--loader-container scene_element '+ options.position +'" id="'+ options.id +'">',
                     '<div class="page-container--loader scene_element">LOADING...</div>',
                   '</div>'].join('\n');
         },
 
-        _loadSpeedBump = function _loadSpeedBump(direction){
+        _loadSpeedBump = function _loadSpeedBump(position){
           var $speedBumpEl = null,
               id = settings.nextAreaID.replace('#', ''),
-              speedBumpHTML = _templateSpeedBump({ id: id, direction: direction }),
+              speedBumpHTML = _templateSpeedBump({ id: id, position: position }),
               speedBump = $.parseHTML(speedBumpHTML);
 
           if (!$('#' + $(speedBump).attr('id')).length){
-            if (direction === "append") {
+            if (position === "append") {
               $(settings.stage).append(speedBumpHTML);
             } else {
               $(settings.stage).prepend(speedBumpHTML);
             }
             $speedBumpEl = $('#' + $(speedBump).attr('id'));
-            $speedBumpEl.addClass('scene_element--fadeinup');
+            toggleSpeedBump({el: $speedBumpEl, position: position, visible: true }); //$speedBumpEl.addClass('scene_element--fadeinup');
 
             _loadInNextPage({
               speedBumpEl: $speedBumpEl,
-              direction: direction
+              position: position
             });
 
           } else {
             $speedBumpEl = $('#' + $(speedBump).attr('id'));
-            $speedBumpEl.toggleClass('scene_element--fadeinup');
+            toggleSpeedBump({el: $speedBumpEl, position: position, visible: true });  //$speedBumpEl.toggleClass('scene_element--fadeinup');
           }
         },
-        _loadInNextPage = function _loadInNextPage(args){
+        _loadInNextPage = function _loadInNextPage(params){
           var status = false;
           $.get('index.html')
             .then(function(result){
@@ -60,10 +60,10 @@ $(function(){
                   status = !!$parsedPage;
               if (status){
                 setTimeout(function(){
-                  $(args.speedBumpEl).toggleClass('scene_element--fadeinup scene_element--fadeoutdown');
+                  $(params.speedBumpEl).toggleClass('scene_element--fadeinup scene_element--fadeoutdown');
                 }, 1000);
               }
-              if (args.direction === "append") {
+              if (params.position === "append") {
                 $(settings.stage).find(settings.page).append($parsedPage);
               } else {
                 $(settings.stage).find(settings.page).prepend($parsedPage);
@@ -71,7 +71,7 @@ $(function(){
               triggerPageTransition({
                 loaded: status,
                 page: $parsedPage,
-                direction: args.direction
+                direction: params.position
               });
 
             }, function(){
@@ -83,24 +83,38 @@ $(function(){
             return status;
           }
         },
-        triggerPageTransition = function triggerPageTransition(transition){
-          if (transition.direction === "prepend"){
+        toggleSpeedBump = function toggleSpeedBump(params){ //{ el: params.speedBumpEl, position: 'top || bottom', visible: true || false }
+          if(params.position == "prepend"){
+            debugger;
+          }
+          if(params.position == "append"){
+            debugger;
+          }
+        },
+        triggerPageTransition = function triggerPageTransition(params){
+          if (params.position === "prepend"){
             setTimeout(function(){
-              $(transition.page).addClass('scene_element--fadeindown');
-              $('html, body').animate({ scrollTop: $(transition.page).offset().top / 8 }, 500);
+              $(params.page).addClass('scene_element--fadeindown');
+              $('html, body').animate({ scrollTop: $(params.page).offset().top / 8 }, 500);
               setTimeout(function(){
-                $(transition.speedBumpEl).toggleClass('scene_element--fadeinup');
+                toggleSpeedBump({ el: params.speedBumpEl, position: params.position, visible: true });
 
+                setTimeout(function(){
+                  toggleSpeedBump({ el: params.speedBumpEl, position: params.position, visible: false });
+                }, 1000);
               }, 1000);
             }, 1000);
           }
-          if (transition.direction === "append"){
+          if (params.position === "append"){
             setTimeout(function(){
-              $(transition.page).addClass('scene_element--fadeinup');
-              $('html, body').animate({ scrollTop: $(transition.page).offset().top / 8 }, 500);
+              $(params.page).addClass('scene_element--fadeinup');
+              $('html, body').animate({ scrollTop: $(params.page).offset().top / 8 }, 500);
               setTimeout(function(){
-                $(transition.speedBumpEl).toggleClass('scene_element--fadeinup');
+                toggleSpeedBump({ el: params.speedBumpEl, position: 'bottom', visible: true });
 
+                setTimeout(function(){
+                  toggleSpeedBump({ el: params.speedBumpEl, position: 'bottom', visible: false });
+                }, 1000);
               }, 1000);
             }, 1000);
           }
