@@ -29,7 +29,7 @@ h1.full-height{
 .page-container{
   background: #e0e0e0;
 }
-.page-container--loader-container{
+.speedBump-container{
   $height: 10vh;
   position: fixed;
   line-height: $height;
@@ -41,20 +41,20 @@ h1.full-height{
   color: lighten(#222, 20%);
   font-size: 30px;
   text-align: center;
-  transition: all .2s ease-in-out 1s;
+  transition: all 1s ease-in-out 1s;
   overflow: hidden;
   // opacity: 0;
   // &.active{
   //   opacity: 1;
   //   position: relative;
   // }
-  &.append{
-    bottom: 0;
+  &.speedBump-append{
+    bottom: 0vh;
   }
-  &.prepend{
-    top: 0;
+  &.speedBump-prepend{
+    top: 0vh;
   }
-  .page-container--loader{
+  .speedBump{
     transition: all .2s ease-in-out 1s;
     position: absolute;
     width: 100%;

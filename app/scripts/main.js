@@ -21,14 +21,14 @@ $(function(){
           return $(el).offset().top;
         },
         _templateSpeedBump = function _templateSpeedBump(options){
-          return ['<div class="page-container--loader-container scene_element '+ options.position +'" id="'+ options.id +'">',
-                    '<div class="page-container--loader scene_element">LOADING...</div>',
+          return ['<div class="speedBump-container speedBump-'+ options.position +'" id="'+ options.id + '-' + options.position +'">',
+                    '<div class="speedBump">LOADING...</div>',
                   '</div>'].join('\n');
         },
 
         _loadSpeedBump = function _loadSpeedBump(position){
           var $speedBumpEl = null,
-              id = settings.nextAreaID.replace('#', ''),
+              id = "speedBump",
               speedBumpHTML = _templateSpeedBump({ id: id, position: position }),
               speedBump = $.parseHTML(speedBumpHTML);
 
@@ -60,7 +60,7 @@ $(function(){
                   status = !!$parsedPage;
               if (status){
                 setTimeout(function(){
-                  $(params.speedBumpEl).toggleClass('scene_element--fadeinup scene_element--fadeoutdown');
+                  // $(params.speedBumpEl).toggleClass('scene_element--fadeinup scene_element--fadeoutdown');
                 }, 1000);
               }
               if (params.position === "append") {
@@ -83,12 +83,16 @@ $(function(){
             return status;
           }
         },
-        toggleSpeedBump = function toggleSpeedBump(params){ //{ el: params.speedBumpEl, position: 'top || bottom', visible: true || false }
-          if(params.position == "prepend"){
-            debugger;
-          }
-          if(params.position == "append"){
-            debugger;
+        toggleSpeedBump = function toggleSpeedBump(params){ //{ el: params.speedBumpEl, position: 'prepend || append', visible: true || false }
+          var translateY;
+          if (params.visible){
+            translateY = params.position === "prepend" ? '100%' : '-100%';
+            //debugger;
+            $(params.el).css({opacity: 1, transform: 'translate3d(0, '+ translateY +', 0)'});
+          } else {
+            translateY = params.position === "prepend" ? '-100%' : '100%';
+            //debugger;
+            $(params.el).css({opacity: 1, transform: 'translate3d(0, '+ translateY +', 0)'});
           }
         },
         triggerPageTransition = function triggerPageTransition(params){
@@ -110,10 +114,10 @@ $(function(){
               $(params.page).addClass('scene_element--fadeinup');
               $('html, body').animate({ scrollTop: $(params.page).offset().top / 8 }, 500);
               setTimeout(function(){
-                toggleSpeedBump({ el: params.speedBumpEl, position: 'bottom', visible: true });
+                toggleSpeedBump({ el: params.speedBumpEl, position: params.position, visible: true });
 
                 setTimeout(function(){
-                  toggleSpeedBump({ el: params.speedBumpEl, position: 'bottom', visible: false });
+                  toggleSpeedBump({ el: params.speedBumpEl, position: params.position, visible: false });
                 }, 1000);
               }, 1000);
             }, 1000);
