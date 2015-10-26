@@ -32,38 +32,39 @@ h1.full-height{
 .speedBump-container{
   $height: 10vh;
   position: fixed;
-  line-height: $height;
   left: 0;
   right:0;
   height: $height;
-  z-index: 0;
-  // background: #222;
+  z-index: 10;
   color: lighten(#222, 20%);
   font-size: 30px;
   text-align: center;
-  transition: all 1s ease-in-out 1s;
+  transition: all 1s ease-in-out;
   overflow: hidden;
-  // opacity: 0;
-  // &.active{
-  //   opacity: 1;
-  //   position: relative;
-  // }
+
   &.speedBump-append{
-    bottom: 0vh;
+    bottom: 0;
+    .speedBump{
+      bottom: 0;
+    }
   }
   &.speedBump-prepend{
-    top: 0vh;
+    top: 0;
+    .speedBump{
+      top: 0;
+    }
   }
   .speedBump{
-    transition: all .2s ease-in-out 1s;
+    transition: all .2s ease-in-out .2s;
     position: absolute;
     width: 100%;
-    background: purple;
-    // height: 0;
-    bottom: 0;
-    top: 0;
+    background: #444;
     line-height: $height;
-    // overflow: hidden;
+    height: 0;
+    overflow: hidden;
+    &.active{
+      height: 100%;
+    }
   }
 }
 
