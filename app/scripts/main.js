@@ -78,9 +78,7 @@ $( function() {
         });
         return promise;
       },
-      _toggleSpeedBump = function _toggleSpeedBump( params, callback ) { //{ el: params.speedBumpEl, position: 'prepend || append', visible: true || false }
-        var speedBumpTimerId;
-        console.log(params);
+      _toggleSpeedBump = function _toggleSpeedBump( params, callback ) {
         if( params.visible ) {
           $( params.el ).find( '.speedBump' ).addClass( 'active' );
         } else {
@@ -91,40 +89,17 @@ $( function() {
         }
       },
       triggerPageTransition = function triggerPageTransition( params ) {
-        debugger;
-        // if( params.position === "prepend" ) {
-        //   setTimeout( function() {
-        //     $( params.page ).addClass( 'scene_element--fadeindown' );
-        //     $( 'html, body' ).animate( {
-        //       scrollTop: $( params.page ).offset().top / 8
-        //     }, 500 );
-        //     setTimeout( function() {
-        //       _toggleSpeedBump( {
-        //         el: params.speedBumpEl,
-        //         position: params.position,
-        //         visible: true
-        //       } );
-        //
-        //       setTimeout( function() {
-        //         _toggleSpeedBump( {
-        //           el: params.speedBumpEl,
-        //           position: params.position,
-        //           visible: false
-        //         } );
-        //       }, 1000 );
-        //     }, 1000 );
-        //   }, 1000 );
-        // }
         if( params.position === "append" ) {
           $( params.page ).addClass( 'scene_element--fadeinup' );
-
-          setTimeout( function() {
-            $( 'html, body' ).animate( {
-              scrollTop: $( params.page ).offset().top / 8
-            }, 500 );
-          }, 1000 );
-
+          $( 'html, body' ).animate( {
+            scrollTop: $( params.page ).offset().top / 8
+          }, 500 );
         }
+      },
+      _scrollWindow = function _scrollWindow ( params ) {
+        var topOffset = params.type === 'preview' ? $( params.el ).offset().top - ($( params.el ).offset().top * 0.75) : $( params.el ).offset().top + $( params.el ).offset().top / 4;
+        console.log(topOffset);
+        $( 'html, body' ).animate( { scrollTop: topOffset }, 500 );
       },
       _isHidden = function _isHidden( el ) {
         return $( el ).css( 'opacity' ) === 0;
@@ -138,7 +113,6 @@ $( function() {
 
           if( thisScrollTop === 0 ) {
             console.log( "Reached beginning of page." );
-            // _loadNewContent('prepend');
           }
 
           if( $window.scrollTop() + $window.height() > $document.height() - 60 ) {
@@ -162,6 +136,11 @@ $( function() {
                 .then(function( result ) {
                   if( result.position === "append" ) {
                     $( settings.stage ).append( result.$parsedPage );
+                    _scrollWindow({
+                      el: result.$parsedPage,
+                      position: result.position,
+                      type: 'preview'
+                    });
                   } else {
                     $( settings.stage ).prepend( result.$parsedPage );
                   }
@@ -183,7 +162,7 @@ $( function() {
                       el: speedBumpEl,
                       position: error.position,
                       visible: false
-                    } , function(){
+                    } , function(){ // callback
                       setTimeout( function() {
                         $( speedBumpEl ).find( '.speedBump' ).removeClass( 'bg-danger text-danger' ).text( error.previousText );
                       }, 1000);
