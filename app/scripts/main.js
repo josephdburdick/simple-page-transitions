@@ -13,6 +13,16 @@ $( function() {
         prevAreaID: '#page-prev',
         nextAreaID: '#page-next',
       },
+      routes = {
+        '': 'home',
+        '/': 'home',
+        'home' : 'home',
+        'work' : 'work',
+        'services' : 'services',
+        'about' : 'about',
+        'thoughts' : 'thoughts',
+        'contact' : 'contact'
+      },
       settings,
       getHeightandOffset = function getHeightandOffset( el ) {
         return $( el ).outerHeight( true ) + $( el ).offset().top;
@@ -53,7 +63,7 @@ $( function() {
         var status = false,
             error;
         var promise = new RSVP.Promise( function( resolve, reject ) {
-          $.get( 'index.html' )
+          $.get( 'about.html' )
             .done( function( result ) {
               var
                 $html = $( result ),
