@@ -12,11 +12,12 @@ $( function() {
         mainAreaID: '#page-current',
         prevAreaID: '#page-prev',
         nextAreaID: '#page-next',
+
       },
       routes = {
-        '': 'home',
-        '/': 'home',
-        'home' : 'home',
+        '': 'index',
+        '/': 'index',
+        'index' : 'index',
         'work' : 'work',
         'services' : 'services',
         'about' : 'about',
@@ -30,34 +31,49 @@ $( function() {
       distanceFromPageTop = function distanceFromPageTop( el ) {
         return $( el ).offset().top;
       },
-      _templateSpeedBump = function _templateSpeedBump( options ) {
-        return [ '<div class="speedBump-container speedBump-' + options.position + '" id="' + options.id + '-' + options.position +'">',
-          '<div class="speedBump">LOADING...</div>',
-        '</div>' ].join( '\n' );
-      },
+      _initCTAbuttons = function _initCTAbuttons($el) {
+        $el.off('click').on('click', function (ev) {
+          ev.preventDefault();
 
+          _loadAnimateNextPage({
+            position: ev.currentTarget.dataset.position,
+            el: speedBumpEl
+          });
+
+        });
+      },
+      _templateSpeedBump = function _templateSpeedBump( params ) {
+        return [ '<a href="#" data-role="speedbump" data-position="'+ params.position +'" id="' + params.id + '-' + params.page + '-' + params.position +'" class="speedBump-container speedBump-' + params.position + '">',
+          '<div class="speedBump">LOADING...</div>',
+        '</a>' ].join( '\n' );
+      },
       _getSpeedBump = function _getSpeedBump( position ) {
         var $speedBumpEl = null,
           id = "speedBump",
+          page = routes[window.location.hash.replace('#', '')],
           speedBumpHTML = _templateSpeedBump( {
             id: id,
+            page: page,
             position: position
           } ),
           speedBump = $.parseHTML( speedBumpHTML );
 
         if( !$( '#' + $( speedBump ).attr( 'id' ) ).length ) {
           if( position === "append" ) {
-            $( settings.stage ).append( speedBumpHTML );
+            $( settings.stage ).find('[data-page="'+ page +'"]').append( speedBumpHTML );
           } else {
-            $( settings.stage ).prepend( speedBumpHTML );
+            $( settings.stage ).find('[data-page="'+ page +'"]').prepend( speedBumpHTML );
           }
           $speedBumpEl = $( '#' + $( speedBump ).attr( 'id' ) );
+          _initCTAbuttons($speedBumpEl);
           return $speedBumpEl;
 
         } else {
           $speedBumpEl = $( '#' + $( speedBump ).attr( 'id' ) );
+          _initCTAbuttons($speedBumpEl);
           return $speedBumpEl;
         }
+
       },
       _loadInNextPage = function _loadInNextPage( params ) {
         var status = false,
@@ -72,6 +88,7 @@ $( function() {
 
                 result = {
                   loaded: status,
+                  pageName: $html.find('[data-role="page"]').data('page'),
                   $parsedPage: $parsedPage,
                   position: params.position
                 };
@@ -101,6 +118,7 @@ $( function() {
       triggerPageTransition = function triggerPageTransition( params ) {
         if( params.position === "append" ) {
           $( params.page ).addClass( 'scene_element--fadeinup' );
+
           $( 'html, body' ).animate( {
             scrollTop: $( params.page ).offset().top / 8
           }, 500 );
@@ -109,10 +127,13 @@ $( function() {
       _scrollWindow = function _scrollWindow ( params ) {
         var topOffset = 0;
         if ( params.type === 'preview' ) {
-          topOffset = $( params.el ).offset().top - $(params.el).outerHeight(true) / 1.25;
-        } else {
-          topOffset = $( params.el ).offset().top + $( params.el ).offset().top / 4;
+          topOffset = $( params.el ).offset().top - $( params.el ).outerHeight(true) / 1.25;
+        } else if ( params.type === 'half' ) {
+          topOffset = $( params.el ).offset().top - $( params.el ).outerHeight(true) / 2;
+        } else if ( params.type === 'whole' ) {
+          topOffset = $( params.el ).offset().top;
         }
+
         $( 'html, body' ).animate( { scrollTop: topOffset }, 500 );
       },
       _isHidden = function _isHidden( el ) {
@@ -123,7 +144,7 @@ $( function() {
         $window.on( 'scroll', function( ev ) {
           var thisScrollTop = Math.round( $( this ).scrollTop() ),
             thisInnerHeight = Math.round( $( this ).innerHeight() ),
-            position;
+            position, speedBumpEl;
 
           if( thisScrollTop === 0 ) {
             console.log( "Reached beginning of page." );
@@ -131,94 +152,77 @@ $( function() {
 
           if( $window.scrollTop() + $window.height() > $document.height() - 60 ) {
             console.log( 'Near end of page.' );
+            position = 'append';
+            speedBumpEl = _getSpeedBump( position );
           }
 
           if( $window.scrollTop() + $window.height() === $document.height() ) {
             console.log( 'Reached end of page.' );
-
             position = 'append';
-            var speedBumpEl = _getSpeedBump( position );
+            speedBumpEl = _getSpeedBump( position );
 
-            _toggleSpeedBump( {
-              el: speedBumpEl,
+            _loadAnimateNextPage({
               position: position,
-              visible: true
-            } , function(){
-              setTimeout(function(){
-                _loadInNextPage( {
-                  position: position
-                } )
-                  .then(function( result ) {
-                    if( result.position === "append" ) {
-                      $( settings.stage ).append( result.$parsedPage );
-                      _scrollWindow({
-                        el: result.$parsedPage,
-                        position: result.position,
-                        type: 'preview'
-                      });
-                    } else {
-                      $( settings.stage ).prepend( result.$parsedPage );
-                    }
-                    _toggleSpeedBump( {
-                      el: speedBumpEl,
-                      position: result.position,
-                      visible: false
-                    } );
-                  }, function( error ){
-                    error.previousText = $( speedBumpEl ).find( '.speedBump' ).text();
-                    _toggleSpeedBump( {
-                      el: speedBumpEl,
-                      position: error.position,
-                      visible: true
-                    } );
-                    $( speedBumpEl ).find( '.speedBump' ).addClass( 'bg-danger text-danger' ).text( error.errorMsg );
-                    setTimeout(function(){
-                      _toggleSpeedBump( {
-                        el: speedBumpEl,
-                        position: error.position,
-                        visible: false
-                      } , function(){ // callback
-                        setTimeout( function() {
-                          $( speedBumpEl ).find( '.speedBump' ).removeClass( 'bg-danger text-danger' ).text( error.previousText );
-                        }, 2000);
-                      });
-
-                    }, 2000 );
-                  });
-              }, 2000);
+              el: speedBumpEl
             });
-
           }
 
         } );
       },
-      _loadNewContent = function _loadNewContent( position ) {
-        var clonePage;
-        if( position === "append" ) {
-          clonePage = $( settings.mainAreaID ).find( '.container' ).last().clone();
-          clonePage.addClass( 'clone' ).find( '.scene_element' ).removeClass(
-            'active scene_element--fadeinup scene_element--fadeindown scene_element--fadein'
-          );
-          $( clonePage ).appendTo( settings.mainAreaID );
-          triggerPageTransition( {
-            position: 'append'
-          } );
-        } else {
-          clonePage = $( settings.mainAreaID ).find( '.container' ).first().clone();
-          clonePage.addClass( 'clone' ).find( '.scene_element' ).removeClass(
-            'active scene_element--fadeinup scene_element--fadeindown scene_element--fadein'
-          );
-          $( clonePage ).prependTo( settings.mainAreaID );
-          triggerPageTransition( {
-            position: 'prepend'
-          } );
-        }
+      _loadAnimateNextPage = function _loadAnimateNextPage ( params ) {
+        _toggleSpeedBump( {
+          el: params.speedBumpEl,
+          position: params.position,
+          visible: true
+        } , function(){
+          setTimeout(function(){
+            _loadInNextPage( {
+              position: params.position
+            } )
+              .then(function( result ) {
+                window.location.hash = result.pageName;
+                if( result.position === "append" ) {
+                  $( settings.stage ).append( result.$parsedPage );
+                  _scrollWindow({
+                    el: result.$parsedPage,
+                    position: result.position,
+                    type: 'whole'
+                  });
+                } else {
+                  $( settings.stage ).prepend( result.$parsedPage );
+                }
+                _toggleSpeedBump( {
+                  el: params.speedBumpEl,
+                  position: result.position,
+                  visible: false
+                } );
+              }, function( error ){
+                error.previousText = $( params.speedBumpEl ).find( '.speedBump' ).text();
+                _toggleSpeedBump( {
+                  el: params.speedBumpEl,
+                  position: error.position,
+                  visible: true
+                } );
 
-        return clonePage;
+                $( params.speedBumpEl ).find( '.speedBump' ).addClass( 'bg-danger text-danger' ).text( error.errorMsg );
+
+                setTimeout(function(){
+                  _toggleSpeedBump( {
+                    el: params.speedBumpEl,
+                    position: error.position,
+                    visible: false
+                  } , function(){ // callback
+                    setTimeout( function() {
+                      $( params.speedBumpEl ).find( '.speedBump' ).removeClass( 'bg-danger text-danger' ).text( error.previousText );
+                    }, 2000);
+                  });
+                }, 2000 );
+
+              });
+          }, 2000);
+        });
       },
       _render = function _render() {
-        // var bodyOffsetTop = distanceFromPageTop(settings.prevAreaID);
-        // $window.scrollTop(bodyOffsetTop);
         setTimeout( function() {
           $window.on( 'scroll', _onScroll() );
         }, 500 );
@@ -227,8 +231,7 @@ $( function() {
         settings = $.extend( {}, defaults, options );
         _render();
         $window.load( function() {
-          $window.scrollTop( $( '[data-page] .page-block' ).offset()
-            .top );
+          $window.scrollTop( $( '[data-page] .page-block' ).offset().top );
         } );
       };
 
