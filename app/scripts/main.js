@@ -97,8 +97,12 @@ $( function() {
         }
       },
       _scrollWindow = function _scrollWindow ( params ) {
-        var topOffset = params.type === 'preview' ? $( params.el ).offset().top - ($( params.el ).offset().top * 0.75) : $( params.el ).offset().top + $( params.el ).offset().top / 4;
-        console.log(topOffset);
+        var topOffset = 0;
+        if ( params.type === 'preview' ) {
+          topOffset = $( params.el ).offset().top - $(params.el).outerHeight(true) / 1.25;
+        } else {
+          topOffset = $( params.el ).offset().top + $( params.el ).offset().top / 4;
+        }
         $( 'html, body' ).animate( { scrollTop: topOffset }, 500 );
       },
       _isHidden = function _isHidden( el ) {
@@ -124,54 +128,55 @@ $( function() {
 
             position = 'append';
             var speedBumpEl = _getSpeedBump( position );
+
             _toggleSpeedBump( {
               el: speedBumpEl,
               position: position,
               visible: true
-            } );
-            setTimeout(function(){
-              _loadInNextPage( {
-                position: position
-              } )
-                .then(function( result ) {
-                  if( result.position === "append" ) {
-                    $( settings.stage ).append( result.$parsedPage );
-                    _scrollWindow({
-                      el: result.$parsedPage,
+            } , function(){
+              setTimeout(function(){
+                _loadInNextPage( {
+                  position: position
+                } )
+                  .then(function( result ) {
+                    if( result.position === "append" ) {
+                      $( settings.stage ).append( result.$parsedPage );
+                      _scrollWindow({
+                        el: result.$parsedPage,
+                        position: result.position,
+                        type: 'preview'
+                      });
+                    } else {
+                      $( settings.stage ).prepend( result.$parsedPage );
+                    }
+                    _toggleSpeedBump( {
+                      el: speedBumpEl,
                       position: result.position,
-                      type: 'preview'
-                    });
-                  } else {
-                    $( settings.stage ).prepend( result.$parsedPage );
-                  }
-                  _toggleSpeedBump( {
-                    el: speedBumpEl,
-                    position: result.position,
-                    visible: false
-                  } );
-                }, function( error ){
-                  error.previousText = $( speedBumpEl ).find( '.speedBump' ).text();
-                  _toggleSpeedBump( {
-                    el: speedBumpEl,
-                    position: error.position,
-                    visible: true
-                  } );
-                  $( speedBumpEl ).find( '.speedBump' ).addClass( 'bg-danger text-danger' ).text( error.errorMsg );
-                  setTimeout(function(){
+                      visible: false
+                    } );
+                  }, function( error ){
+                    error.previousText = $( speedBumpEl ).find( '.speedBump' ).text();
                     _toggleSpeedBump( {
                       el: speedBumpEl,
                       position: error.position,
-                      visible: false
-                    } , function(){ // callback
-                      setTimeout( function() {
-                        $( speedBumpEl ).find( '.speedBump' ).removeClass( 'bg-danger text-danger' ).text( error.previousText );
-                      }, 1000);
-                    });
+                      visible: true
+                    } );
+                    $( speedBumpEl ).find( '.speedBump' ).addClass( 'bg-danger text-danger' ).text( error.errorMsg );
+                    setTimeout(function(){
+                      _toggleSpeedBump( {
+                        el: speedBumpEl,
+                        position: error.position,
+                        visible: false
+                      } , function(){ // callback
+                        setTimeout( function() {
+                          $( speedBumpEl ).find( '.speedBump' ).removeClass( 'bg-danger text-danger' ).text( error.previousText );
+                        }, 2000);
+                      });
 
-                  }, 2000 );
-
-                });
-            }, 2000);
+                    }, 2000 );
+                  });
+              }, 2000);
+            });
 
           }
 
