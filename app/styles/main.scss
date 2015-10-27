@@ -65,6 +65,9 @@ h1.full-height{
     &.active{
       height: 100%;
     }
+    &.bg-danger{
+      background: lighten(red, 40%);
+    }
   }
 }
 

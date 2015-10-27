@@ -21,11 +21,9 @@ $( function() {
         return $( el ).offset().top;
       },
       _templateSpeedBump = function _templateSpeedBump( options ) {
-        return [ '<div class="speedBump-container speedBump-' + options
-          .position + '" id="' + options.id + '-' + options.position +
-          '">',
-                    '<div class="speedBump">LOADING...</div>',
-                  '</div>' ].join( '\n' );
+        return [ '<div class="speedBump-container speedBump-' + options.position + '" id="' + options.id + '-' + options.position +'">',
+          '<div class="speedBump">LOADING...</div>',
+        '</div>' ].join( '\n' );
       },
 
       _getSpeedBump = function _getSpeedBump( position ) {
@@ -52,8 +50,9 @@ $( function() {
         }
       },
       _loadInNextPage = function _loadInNextPage( params ) {
-        var status = false;
-        var promise = new RSVP.Promise(function(resolve, reject) {
+        var status = false,
+            error;
+        var promise = new RSVP.Promise( function( resolve, reject ) {
           $.get( 'index.html' )
             .done( function( result ) {
               var
@@ -66,33 +65,33 @@ $( function() {
                   $parsedPage: $parsedPage,
                   position: params.position
                 };
-              resolve(result);
+              resolve( result );
             })
-            .fail( function(error) {
-              result = {
+            .fail( function( error ) {
+              var result = {
                 loaded: status,
                 position: params.position,
-                error: error
+                errorMsg: "Error: " + error.responseText
               };
-              reject(result);
+              reject( result );
             });
         });
         return promise;
       },
-      _toggleSpeedBump = function _toggleSpeedBump( params ) { //{ el: params.speedBumpEl, position: 'prepend || append', visible: true || false }
+      _toggleSpeedBump = function _toggleSpeedBump( params, callback ) { //{ el: params.speedBumpEl, position: 'prepend || append', visible: true || false }
         var speedBumpTimerId;
         console.log(params);
         if( params.visible ) {
-          //speedBumpTimerId = setTimeout( function() {
-            $( params.el ).find( '.speedBump' ).addClass( 'active' );
-          //}, 100);
-        } else if ( !params.visible ) {
-          //speedBumpTimerId = setTimeout( function() {
-            $( params.el ).find( '.speedBump' ).removeClass( 'active' );
-          //}, 100);
+          $( params.el ).find( '.speedBump' ).addClass( 'active' );
+        } else {
+          $( params.el ).find( '.speedBump' ).removeClass( 'active' );
+        }
+        if ( callback ){
+          callback();
         }
       },
       triggerPageTransition = function triggerPageTransition( params ) {
+        debugger;
         // if( params.position === "prepend" ) {
         //   setTimeout( function() {
         //     $( params.page ).addClass( 'scene_element--fadeindown' );
@@ -119,48 +118,12 @@ $( function() {
         if( params.position === "append" ) {
           $( params.page ).addClass( 'scene_element--fadeinup' );
 
-          // var speedBumpOn = function() {
-          //   return _toggleSpeedBump( {
-          //     el: params.speedBumpEl,
-          //     position: params.position,
-          //     visible: true
-          //   } );
-          // };
-          //
-          // var speedBumpOff = function() {
-          //   return _toggleSpeedBump( {
-          //     el: params.speedBumpEl,
-          //     position: params.position,
-          //     visible: false
-          //   } );
-          // };
+          setTimeout( function() {
+            $( 'html, body' ).animate( {
+              scrollTop: $( params.page ).offset().top / 8
+            }, 500 );
+          }, 1000 );
 
-
-          // Promise.race([speedBumpOn, speedBumpOff]).then( function( resolve, reject ) ) {
-          //
-          // });
-
-            // setTimeout( function() {
-            //
-            //   _toggleSpeedBump( {
-            //     el: params.speedBumpEl,
-            //     position: params.position,
-            //     visible: false
-            //   } );
-            // }, 2000);
-
-
-            //   setTimeout( function() {
-            //     // $( 'html, body' ).animate( {
-            //     //   scrollTop: $( params.page ).offset().top / 8
-            //     // }, 500 );
-            //     _toggleSpeedBump( {
-            //       el: params.speedBumpEl,
-            //       position: params.position,
-            //       visible: false
-            //     } );
-            //   }, 1000 );
-            // }, 1000 );
         }
       },
       _isHidden = function _isHidden( el ) {
@@ -208,11 +171,26 @@ $( function() {
                     visible: false
                   } );
                 }, function( error ){
+                  error.previousText = $( speedBumpEl ).find( '.speedBump' ).text();
                   _toggleSpeedBump( {
                     el: speedBumpEl,
-                    position: position,
-                    visible: false
+                    position: error.position,
+                    visible: true
                   } );
+                  $( speedBumpEl ).find( '.speedBump' ).addClass( 'bg-danger text-danger' ).text( error.errorMsg );
+                  setTimeout(function(){
+                    _toggleSpeedBump( {
+                      el: speedBumpEl,
+                      position: error.position,
+                      visible: false
+                    } , function(){
+                      setTimeout( function() {
+                        $( speedBumpEl ).find( '.speedBump' ).removeClass( 'bg-danger text-danger' ).text( error.previousText );
+                      }, 1000);
+                    });
+
+                  }, 2000 );
+
                 });
             }, 2000);
 
