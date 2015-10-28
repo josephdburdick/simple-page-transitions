@@ -171,7 +171,7 @@ $( function() {
             console.log( 'Reached end of page.' );
             position = 'append';
             speedBumpEl = _getSpeedBump( position );
-            page = _getURLHash();
+            page = getURLHash();
             _loadAnimateNextPage({
               page: page,
               position: position,
