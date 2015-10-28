@@ -39,7 +39,7 @@ $( function() {
           $window.scrollTop( $( '[data-page] .page-block' ).offset().top );
         } );
       },
-      _getURLHash = function _getURLHash() {
+      getURLHash = function getURLHash() {
         return window.location.hash.replace('#', '');
       },
       _initCTAbuttons = function _initCTAbuttons($el) {
@@ -238,11 +238,16 @@ $( function() {
         setTimeout( function() {
           $window.on( 'scroll', _onScroll() );
         }, 500 );
+
+        if(window.location.hash) {
+          console.log('Current hash value: ' + getURLHash());
+        }
       };
 
     return {
       init: init,
       triggerPageTransition: triggerPageTransition,
+      getURLHash: getURLHash,
       getHeightandOffset: getHeightandOffset,
       distanceFromPageTop: distanceFromPageTop
     };
