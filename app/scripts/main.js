@@ -1,6 +1,7 @@
 /*global $:false, jQuery:false, window:false */
 $( function() {
   'use strict';
+
   var pageManager = ( function() {
     var $window = $( window ),
       $document = $( document ),
@@ -14,6 +15,7 @@ $( function() {
         nextAreaID: '#page-next',
 
       },
+      settings,
       routes = {
         '': 'index',
         '/': 'index',
@@ -24,12 +26,21 @@ $( function() {
         'thoughts' : 'thoughts',
         'contact' : 'contact'
       },
-      settings,
       getHeightandOffset = function getHeightandOffset( el ) {
         return $( el ).outerHeight( true ) + $( el ).offset().top;
       },
       distanceFromPageTop = function distanceFromPageTop( el ) {
         return $( el ).offset().top;
+      },
+      init = function init( options ) {
+        settings = $.extend( {}, defaults, options );
+        _render();
+        $window.load( function() {
+          $window.scrollTop( $( '[data-page] .page-block' ).offset().top );
+        } );
+      },
+      _getURLHash = function _getURLHash() {
+        return window.location.hash.replace('#', '');
       },
       _initCTAbuttons = function _initCTAbuttons($el) {
         $el.off('click').on('click', function (ev) {
@@ -37,9 +48,8 @@ $( function() {
 
           _loadAnimateNextPage({
             position: ev.currentTarget.dataset.position,
-            el: speedBumpEl
+            el: $(ev.currentTarget)
           });
-
         });
       },
       _templateSpeedBump = function _templateSpeedBump( params ) {
@@ -75,6 +85,7 @@ $( function() {
         }
 
       },
+
       _loadInNextPage = function _loadInNextPage( params ) {
         var status = false,
             error;
@@ -116,11 +127,11 @@ $( function() {
         }
       },
       triggerPageTransition = function triggerPageTransition( params ) {
-        if( params.position === "append" ) {
+        if( params.page ) {
           $( params.page ).addClass( 'scene_element--fadeinup' );
 
           $( 'html, body' ).animate( {
-            scrollTop: $( params.page ).offset().top / 8
+            scrollTop: $( params.page ).offset().top
           }, 500 );
         }
       },
@@ -144,7 +155,7 @@ $( function() {
         $window.on( 'scroll', function( ev ) {
           var thisScrollTop = Math.round( $( this ).scrollTop() ),
             thisInnerHeight = Math.round( $( this ).innerHeight() ),
-            position, speedBumpEl;
+            position, speedBumpEl, page;
 
           if( thisScrollTop === 0 ) {
             console.log( "Reached beginning of page." );
@@ -160,8 +171,9 @@ $( function() {
             console.log( 'Reached end of page.' );
             position = 'append';
             speedBumpEl = _getSpeedBump( position );
-
+            page = _getURLHash();
             _loadAnimateNextPage({
+              page: page,
               position: position,
               el: speedBumpEl
             });
@@ -226,13 +238,6 @@ $( function() {
         setTimeout( function() {
           $window.on( 'scroll', _onScroll() );
         }, 500 );
-      },
-      init = function init( options ) {
-        settings = $.extend( {}, defaults, options );
-        _render();
-        $window.load( function() {
-          $window.scrollTop( $( '[data-page] .page-block' ).offset().top );
-        } );
       };
 
     return {
